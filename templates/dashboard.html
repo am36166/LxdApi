@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+
+{% block title %}Tableau de bord{% endblock %}
+
+{% block content %}
+<h1 class="mt-3">Tableau de bord</h1>
+<div class="container">
+    <h2 class="mt-5">Suivi des métriques du conteneur</h2>
+    <div class="row mb-4">
+        <!-- Carte Graphique CPU -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header text-center bg-primary text-white">
+                    <h5>Graphique CPU</h5>
+                </div>
+                <div class="card-body">
+                    <img src="/plot/cpu" alt="Graphique CPU" class="img-fluid rounded">
+                </div>
+            </div>
+        </div>
+
+        <!-- Carte Graphique Mémoire -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header text-center bg-success text-white">
+                    <h5>Graphique Mémoire</h5>
+                </div>
+                <div class="card-body">
+                    <img src="/plot/memory" alt="Graphique Mémoire" class="img-fluid rounded">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

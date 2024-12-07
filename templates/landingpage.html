@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestion d'Instances LXC/LXD</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+  <!-- Header -->
+  <header class="bg-blue-600 text-white">
+    <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+      <h1 class="text-2xl font-bold">LXC/LXD</h1>
+      <nav class="flex items-center">
+        <a href="#features" class="px-4 hover:underline">Fonctionnalités</a>
+        <a href="#contact" class="px-4 hover:underline">Contact</a>
+        <a href="{{url_for('register')}}" class="border border-accent-color text-accent-color px-4 py-2 rounded-lg font-semibold hover:bg-gray-700">
+            Sign Up
+          </a>
+          <a href="{{url_for('login')}}" class="border border-accent-color text-accent-color px-4 py-2 rounded-lg font-semibold hover:bg-gray-700">
+            Sign In
+          </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="bg-blue-100">
+    <div class="container mx-auto px-6 py-20 text-center">
+      <h2 class="text-4xl font-bold mb-4">Simplifiez la Gestion de Vos Conteneurs</h2>
+      <p class="text-xl text-gray-700 mb-6">
+        Une interface intuitive pour gérer vos instances LXC/LXD avec efficacité.
+      </p>
+      <button class="bg-blue-600 text-white px-6 py-3 rounded-lg text-lg font-semibold hover:bg-blue-500">
+        Découvrir Maintenant
+      </button>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section id="features" class="container mx-auto px-6 py-20">
+    <h3 class="text-3xl font-bold text-center mb-12">Fonctionnalités Principales</h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="bg-white rounded-lg shadow p-6 text-center">
+        <h4 class="text-xl font-semibold mb-4">Gestion Centralisée</h4>
+        <p>Supervisez toutes vos instances à partir d'un tableau de bord unique.</p>
+      </div>
+      <div class="bg-white rounded-lg shadow p-6 text-center">
+        <h4 class="text-xl font-semibold mb-4">Monitoring en Temps Réel</h4>
+        <p>Obtenez des alertes intelligentes sur les performances.</p>
+      </div>
+      <div class="bg-white rounded-lg shadow p-6 text-center">
+        <h4 class="text-xl font-semibold mb-4">Déploiement Automatisé</h4>
+        <p>Créez des conteneurs en quelques clics seulement.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact" class="container mx-auto px-6 py-20">
+    <h3 class="text-3xl font-bold text-center mb-12">Nous Contacter</h3>
+    <form class="max-w-lg mx-auto">
+      <div class="mb-6">
+        <label class="block mb-2 text-gray-600">Nom</label>
+        <input type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2" placeholder="Votre nom">
+      </div>
+      <div class="mb-6">
+        <label class="block mb-2 text-gray-600">Email</label>
+        <input type="email" class="w-full border border-gray-300 rounded-lg px-4 py-2" placeholder="Votre email">
+      </div>
+      <div class="mb-6">
+        <label class="block mb-2 text-gray-600">Message</label>
+        <textarea class="w-full border border-gray-300 rounded-lg px-4 py-2" rows="4" placeholder="Votre message"></textarea>
+      </div>
+      <button class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-500">
+        Envoyer
+      </button>
+    </form>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-blue-600 text-white py-6">
+    <div class="container mx-auto px-6 text-center">
+      <p>© 2024 Gestion LXC/LXD. Tous droits réservés.</p>
+    </div>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Liste des Containers{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    
+    <!-- Table Bootstrap avec un tableau bien stylisé -->
+    <table class="table table-hover table-bordered">
+        <thead class="thead-dark">
+            <tr>
+                <th>Nom</th>
+                <th>Status</th>
+                <th>Description</th>
+                <th>CPU</th>
+                <th>Mémoire</th>
+                <th>IP</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for instance in instances %}
+            <tr>
+                <td>{{ instance.name }}</td>
+                <td>
+                    <span class="badge {% if instance.status == 'Running' %}bg-success{% else %}bg-danger{% endif %}">
+                        {{ instance.status }}
+                    </span>
+                </td>
+                <td>{{ instance.description }}</td>
+                <td>{{ instance.cpu }}</td>
+                <td>{{ instance.memory }}</td>
+                <td>{{ instance.ip }}</td>
+                <td>
+                    <!-- Boutons d'actions avec icônes -->
+                    <form method="POST" action="{{ url_for('start_instance', name=instance.name) }}" class="d-inline">
+                        <button type="submit" class="btn btn-success btn-sm" title="Démarrer">
+                            <i class="bi bi-play-circle"></i> Démarrer
+                        </button>
+                    </form>
+                    
+                    
+                    <form method="POST" action="{{ url_for('stop_instance', name=instance.name) }}" class="d-inline">
+                        <button type="submit" class="btn btn-warning btn-sm" title="Arrêter">
+                            <i class="bi bi-pause-circle"></i> Arrêter
+                        </button>
+                    </form>
+
+                    <form method="POST" action="{{ url_for('delete_instance', name=instance.name) }}" class="d-inline">
+                        <button type="submit" class="btn btn-danger btn-sm" title="Supprimer">
+                            <i class="bi bi-trash"></i> Supprimer
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="7" class="text-center">Aucune instance trouvée.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

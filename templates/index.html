@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Monitoring{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center">LXD Container Metrics Viewer</h1>
+    <form method="POST" class="mt-4">
+        <div class="mb-3">
+            <label for="container_name" class="form-label">Nom du Conteneur</label>
+            <input type="text" id="container_name" name="container_name" class="form-control" placeholder="Nom du conteneur" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Afficher les Graphes</button>
+    </form>
+
+    {% if error %}
+    <div class="alert alert-danger mt-3">{{ error }}</div>
+    {% endif %}
+
+    {% if container_name %}
+    <h2 class="mt-5">Graphes pour {{ container_name }}</h2>
+    <div class="row">
+        {% for graph in graphs %}
+        <div class="col-md-6">
+            <img src="{{ graph }}" alt="Graph" class="img-fluid mt-3">
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+    
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends "admin-dash.html" %}
+
+{% block title %}Visibilité des conteneurs{% endblock %}
+
+{% block content %}
+<div id="conteneurs" class="bg-white rounded-lg shadow-lg p-8">
+  <h2 class="text-3xl font-semibold text-gray-800 mb-6">Liste des Conteneurs</h2>
+  
+  <!-- Tableau des conteneurs -->
+  <div class="overflow-x-auto">
+    <table class="table-auto w-full border-collapse border border-gray-300 rounded-lg shadow-md">
+      <thead class="bg-gray-800 text-white">
+        <tr>
+          <th class="border border-gray-400 px-6 py-3 text-left">Nom</th>
+          <th class="border border-gray-400 px-6 py-3 text-left">Type</th>
+          <th class="border border-gray-400 px-6 py-3 text-left">Statut</th>
+          <th class="border border-gray-400 px-6 py-3 text-left">Propriétaire</th>
+          <th class="border border-gray-400 px-6 py-3 text-left">Ressources</th>
+          <th class="border border-gray-400 px-6 py-3 text-left">IP</th>
+          <th class="border border-gray-400 px-6 py-3 text-center">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for instance in instances %}
+        <tr class="hover:bg-gray-100 transition duration-200">
+          <!-- Nom -->
+          <td class="border border-gray-300 px-6 py-3 font-medium">{{ instance.name }}</td>
+          <!-- Type -->
+
+          <td class="border border-gray-300 px-6 py-3 font-medium">{{ instance.type }}</td>
+
+          <!-- Statut -->
+          <td class="border border-gray-300 px-6 py-3">
+            <span class="px-3 py-1 text-sm font-semibold rounded-full 
+              {% if instance.status == 'running' %}
+                bg-green-100 text-green-700
+              {% else %}
+                bg-red-100 text-red-700
+              {% endif %}">
+              {{ instance.status | capitalize }}
+            </span>
+          </td>
+
+          <!-- Propriétaire -->
+          <td class="border border-gray-300 px-6 py-3">{{ instance.owner or "Admin" }}</td>
+
+          <!-- Ressources -->
+          <td class="border border-gray-300 px-6 py-3 text-sm text-gray-700">
+            <p><strong>CPU :</strong> {{ instance.cpu }}</p>
+            <p><strong>RAM :</strong> {{ instance.memory }}</p>
+          </td>
+
+          <!-- IP -->
+          <td class="border border-gray-300 px-6 py-3">{{ instance.ip }}</td>
+
+          <!-- Actions -->
+          <td class="border border-gray-300 px-6 py-3 text-center">
+            <div class="flex justify-center space-x-2">
+              <a href="{{ url_for('stop_instance', name=instance.name) }}" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition duration-200">
+                Arrêter
+              </a>
+              <a href="{{ url_for('start_instance', name=instance.name) }}" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition duration-200">
+                Redémarrer
+              </a>
+              <a href="{{ url_for('delete_instance', name=instance.name) }}" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition duration-200">
+                Supprimer
+              </a>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
