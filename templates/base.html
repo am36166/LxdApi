@@ -59,6 +59,11 @@
                                 <span class="me-2">📊</span> Monitoring
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if active_page == 'migration' %}active{% endif %}" href="{{ url_for('migration_view') }}">
+                                <span class="me-2">🔄</span> Migration d'Instance
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </nav>

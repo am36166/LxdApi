@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<form action="{{ url_for('migrate_instance') }}" method="POST" class="needs-validation" novalidate>
+    <div class="mb-3">
+        <label for="containerName" class="form-label">Nom du Conteneur</label>
+        <input type="text" class="form-control" id="containerName" name="container_name" placeholder="Entrez le nom du conteneur" required>
+        <div class="invalid-feedback">
+            Veuillez fournir un nom de conteneur valide.
+        </div>
+    </div>
+    <div class="mb-3">
+        <label for="sourceIp" class="form-label">Adresse IP Source</label>
+        <input type="text" class="form-control" id="sourceIp" name="source_ip" placeholder="Entrez l'adresse IP source" required>
+        <div class="invalid-feedback">
+            Veuillez fournir une adresse IP valide.
+        </div>
+    </div>
+    <div class="mb-3">
+        <label for="destIp" class="form-label">Adresse IP Destination</label>
+        <input type="text" class="form-control" id="destIp" name="dest_ip" placeholder="Entrez l'adresse IP destination" required>
+        <div class="invalid-feedback">
+            Veuillez fournir une adresse IP valide.
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Migrer</button>
+</form>
+{% endblock %}

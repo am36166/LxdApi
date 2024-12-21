@@ -4,29 +4,76 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1 class="text-center">LXD Container Metrics Viewer</h1>
-    <form method="POST" class="mt-4">
-        <div class="mb-3">
-            <label for="container_name" class="form-label">Nom du Conteneur</label>
-            <input type="text" id="container_name" name="container_name" class="form-control" placeholder="Nom du conteneur" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Afficher les Graphes</button>
-    </form>
+    <div class="text-center mb-5">
+        <h1 class="fw-bold">Monitoring des Conteneurs LXD</h1>
+        <p class="text-muted">Visualisez les métriques CPU, RAM, et bien plus pour vos conteneurs.</p>
+    </div>
 
-    {% if error %}
-    <div class="alert alert-danger mt-3">{{ error }}</div>
-    {% endif %}
+    <div class="card shadow p-4">
+        <form method="POST">
+            <div class="mb-3">
+                <label for="container_name" class="form-label fw-semibold">Nom du Conteneur</label>
+                <input 
+                    type="text" 
+                    id="container_name" 
+                    name="container_name" 
+                    class="form-control" 
+                    placeholder="Entrez le nom du conteneur" 
+                    required>
+            </div>
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary btn-lg">Afficher les Graphes</button>
+            </div>
+        </form>
+
+        {% if error %}
+        <div class="alert alert-danger mt-4">{{ error }}</div>
+        {% endif %}
+    </div>
 
     {% if container_name %}
-    <h2 class="mt-5">Graphes pour {{ container_name }}</h2>
-    <div class="row">
-        {% for graph in graphs %}
-        <div class="col-md-6">
-            <img src="{{ graph }}" alt="Graph" class="img-fluid mt-3">
+    <div class="mt-5">
+        <h2 class="text-center fw-bold">Graphes pour <span class="text-primary">{{ container_name }}</span></h2>
+        <div class="row mt-4 g-4">
+            {% for graph in graphs %}
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <img src="{{ graph }}" alt="Graph" class="img-fluid rounded">
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
     {% endif %}
 </div>
-    
+
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+    .container h1 {
+        font-size: 2.5rem;
+        color: #343a40;
+    }
+    .card {
+        border: none;
+        border-radius: 10px;
+    }
+    .card img {
+        transition: transform 0.2s ease-in-out;
+    }
+    .card img:hover {
+        transform: scale(1.05);
+    }
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+    .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+    }
+</style>
 {% endblock %}

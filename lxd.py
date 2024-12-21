@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from threading import Lock, Thread
+from pylxd import Client
 import time
 from flask import (
     Flask, jsonify, render_template, request, redirect, url_for, flash, session , Response
@@ -28,6 +29,51 @@ ALIAS_LIST = ["ubuntu", "centos", "debian", "alpine"]
 @app.route('/', methods=['GET'])
 def homepage():
     return render_template('landingpage.html')
+
+@app.route('/migration_view', methods=['GET'])
+def migration_view():
+    if 'username' in session :
+        return render_template('migration.html')
+    return redirect(url_for('login'))
+
+@app.route('/migrate_instance', methods=['POST'])
+def migrate_instance():
+    if 'username' in session:
+        container_name = request.form.get('container_name')
+        source_ip = request.form.get('source_ip')
+        dest_ip = request.form.get('dest_ip')
+
+        if session.get('username') == container_name.split('-')[1]:
+            try:
+                client_source = Client(
+                    endpoint=f'https://{source_ip}:8443',
+                    cert=('C:/Users/lenovo/Desktop/lxc_node/certi/lxd.crt', 'C:/Users/lenovo/Desktop/lxc_node/certi/lxd.key'),
+                    verify=False
+                )
+                client_destination = Client(
+                    endpoint=f'https://{dest_ip}:8443',
+                    cert=('C:/Users/lenovo/Desktop/lxc_node/certi/lxd.crt', 'C:/Users/lenovo/Desktop/lxc_node/certi/lxd.key'),
+                    verify=False
+                )
+
+                # Récupérer la machine virtuelle depuis l'hôte source
+                container = client_source.instances.get(container_name)
+
+                # Migrer l'instance
+                container.migrate(client_destination, wait=True)
+
+                flash(f"L'instance '{container_name}' a été migrée avec succès.", 'success')
+                return redirect(url_for('migration_view'))  # Redirection après migration réussie
+            except Exception as e:
+                # Gestion des erreurs lors de la migration
+                flash(f"Erreur lors de la migration : {str(e)}", 'danger')
+                return redirect(url_for('migration_view'))
+        else:
+            flash("Vous n'êtes pas autorisé à migrer cette instance.", 'danger')
+            return redirect(url_for('migration_view'))
+    else:
+        flash("Veuillez vous connecter pour effectuer cette action.", 'danger')
+        return redirect(url_for('login'))
 
 @app.route('/landingpage')
 def landing_page():
@@ -510,7 +556,7 @@ def update_user():
 
  
  # URL de Prometheus
-PROMETHEUS_URL = 'http://192.168.0.189:9090/api/v1/query_range'
+PROMETHEUS_URL = 'http://lxd:9090/api/v1/query_range'
 
 # Répertoire pour stocker les images de graphiques
 GRAPH_FOLDER = "static/graphs"
@@ -571,6 +617,7 @@ def plot_metric_updated(container_name, df, label):
 def monitoring_updated():
     if request.method == 'POST':
         container_name = request.form.get('container_name')
+        print(container_name)
         if not container_name:
             return render_template('index.html', error="Veuillez entrer un nom de conteneur.")
 
@@ -591,5 +638,11 @@ def monitoring_updated():
         return render_template('index.html', container_name=container_name, graphs=graphs)
 
     return render_template('index.html')
+
+@app.route('/admin/grafana_dashboard')
+def grafana_dashboard():
+    # L'URL de ton tableau de bord Grafana
+    grafana_embed_url = "http://lxd:3000/public-dashboards/2ee1d7c2e46d42efa5074280f6c7ea3e"
+    return render_template('grafana_dashboard.html', grafana_embed_url=grafana_embed_url)
 if __name__ == '__main__':
     app.run(debug=True)

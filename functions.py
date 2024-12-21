@@ -15,8 +15,9 @@ def get_db_connection():
 
 def getClient():
     client = Client(
-        endpoint="https://controller:8443",
-         cert=('C:/Users/lenovo/.config/lxc/client.crt', 'C:/Users/lenovo/.config/lxc/client.key')
+       endpoint="https://lxd:8443",
+         cert=('C:/Users/lenovo/Desktop/lxc_node/certi/lxd.crt', 'C:/Users/lenovo/Desktop/lxc_node/certi/lxd.key'),
+         verify=False
          )
     return client
 
