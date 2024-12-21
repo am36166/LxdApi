@@ -6,6 +6,10 @@
     <title>{% block title %}Dashboard{% endblock %}</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xterm/3.14.5/xterm.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/xterm/3.14.5/xterm.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="container-fluid">
@@ -62,6 +66,11 @@
                         <li class="nav-item">
                             <a class="nav-link {% if active_page == 'migration' %}active{% endif %}" href="{{ url_for('migration_view') }}">
                                 <span class="me-2">🔄</span> Migration d'Instance
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if active_page == 'ssh' %}active{% endif %}" href="{{ url_for('ssh_view') }}">
+                                <span class="me-2">🔗</span> Terminal SSH
                             </a>
                         </li>
                     </ul>

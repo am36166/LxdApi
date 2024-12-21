@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <style>
+        #terminal {
+            margin: 20px auto;
+            width: 50%;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #000000;
+            color: #FFFFFF;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            white-space: pre;
+            overflow: auto;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            margin-top: 50px;
+        }
+        .form-control {
+            width: 50%;
+            margin: 0 auto;
+        }
+
+        .btn {
+            margin-top: 10px;
+        }
+    </style>
+    <div class="container text-center">
+        <div class="mb-3">
+            <label for="ip" class="form-label">Adresse IP :</label>
+            <input type="text" id="ip" class="form-control" placeholder="Entrez l'adresse IP" />
+        </div>
+        <div class="mb-3">
+            <label for="username" class="form-label">Nom d'utilisateur :</label>
+            <input type="text" id="username" class="form-control" placeholder="Entrez le nom d'utilisateur" />
+        </div>
+        <button id="connect-btn" class="btn btn-primary">Se connecter</button>
+    </div>
+    <div id="terminal"></div>
+
+    <script>
+        const term = new Terminal({
+            cursorBlink: true,
+            fontSize: 14,
+            rows: 24,
+            cols: 80,
+            theme: {
+                background: '#000000',
+                foreground: '#FFFFFF'
+            }
+        });
+
+        term.open(document.getElementById('terminal'));
+        term.write('Bienvenue dans le terminal SSH.\r\n');
+
+        const socket = io();
+
+        // Écouteur du bouton "Se connecter"
+        document.getElementById('connect-btn').addEventListener('click', () => {
+            const ip = document.getElementById('ip').value;
+            const username = document.getElementById('username').value;
+
+            if (ip && username) {
+                term.write(`Tentative de connexion à ${ip}...\r\n`);
+                socket.emit('connect_ssh', { container_ip: ip, username: username });
+            } else {
+                term.write('Erreur : Veuillez entrer une adresse IP et un nom d’utilisateur.\r\n');
+            }
+        });
+
+        // Gestion des événements Socket.IO
+        term.onData((data) => {
+            socket.emit('terminal_input', { input: data });
+        });
+
+        socket.on('terminal_output', (data) => term.write(data.output));
+        socket.on('ssh_error', (data) => term.write(`\r\nErreur SSH: ${data.error}\r\n`));
+        socket.on('ssh_connected', () => term.write('\r\nConnexion SSH établie.\r\n'));
+        socket.on('disconnect', () => term.write('\r\nDéconnecté du serveur.\r\n'));
+    </script>
+{% endblock %}

@@ -1,7 +1,10 @@
 from datetime import datetime, timedelta
 from threading import Lock, Thread
 from pylxd import Client
+from flask_socketio import SocketIO, emit
+import paramiko
 import time
+import logging
 from flask import (
     Flask, jsonify, render_template, request, redirect, url_for, flash, session , Response
 )
@@ -20,7 +23,15 @@ matplotlib.use('Agg')  # UI conflict
 
 
 app = Flask(__name__, template_folder='C:\\Users\\lenovo\\Desktop\\lxd_project\\templates')
-CORS(app)
+socketio = SocketIO(app, cors_allowed_origins="*")
+thread_lock = Lock()
+# Configuration des logs
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+# Stockage des connexions SSH
+ssh_connections = {}
+
 app.config['SECRET_KEY'] = 'admin_secret'
 
 ALIAS_LIST = ["ubuntu", "centos", "debian", "alpine"]
@@ -644,5 +655,84 @@ def grafana_dashboard():
     # L'URL de ton tableau de bord Grafana
     grafana_embed_url = "http://lxd:3000/public-dashboards/2ee1d7c2e46d42efa5074280f6c7ea3e"
     return render_template('grafana_dashboard.html', grafana_embed_url=grafana_embed_url)
+
+
+
+def background_thread(sid, channel):
+    """Thread pour écouter les sorties du SSH et les envoyer au client."""
+    while True:
+        try:
+            if channel.recv_ready():
+                output = channel.recv(1024).decode('utf-8', errors='ignore')
+                logger.debug(f"Sortie reçue: {output}")
+                socketio.emit('terminal_output', {'output': output}, room=sid)
+        except Exception as e:
+            logger.error(f"Erreur dans le thread: {str(e)}")
+            break
+
+@socketio.on('connect_ssh')
+def connect_ssh(data):
+    """Connexion au serveur SSH."""
+    container_ip = data.get('container_ip')
+    username = data.get('username', 'ubuntu')
+
+    if not container_ip or not username:
+        emit('ssh_error', {'error': 'Adresse IP ou nom d’utilisateur manquant.'})
+        return
+
+    try:
+        logger.debug(f"Tentative de connexion SSH à {container_ip} avec l’utilisateur {username}")
+
+        # Configuration du client SSH
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(container_ip, username=username, port=22, timeout=10)
+
+        # Ouverture d'un shell interactif
+        channel = ssh.invoke_shell(term='xterm', width=80, height=24)
+        channel.setblocking(0)
+
+        # Sauvegarde de la connexion
+        ssh_connections[request.sid] = {
+            'client': ssh,
+            'channel': channel
+        }
+
+        # Démarrage d'un thread pour lire les sorties SSH
+        socketio.start_background_task(background_thread, request.sid, channel)
+
+        emit('ssh_connected', {'status': 'success'})
+
+    except Exception as e:
+        logger.error(f"Erreur de connexion SSH: {str(e)}")
+        emit('ssh_error', {'error': str(e)})
+
+@socketio.on('terminal_input')
+def handle_terminal_input(data):
+    """Envoi des commandes utilisateur au shell SSH."""
+    if request.sid in ssh_connections:
+        try:
+            command = data.get('input', '')
+            logger.debug(f"Commande utilisateur: {command}")
+            ssh_connections[request.sid]['channel'].send(command)
+        except Exception as e:
+            logger.error(f"Erreur lors de l'envoi de commande: {str(e)}")
+            emit('ssh_error', {'error': str(e)})
+
+@socketio.on('disconnect')
+def disconnect():
+    """Fermeture de la connexion SSH lors de la déconnexion du client."""
+    if request.sid in ssh_connections:
+        try:
+            conn = ssh_connections.pop(request.sid)
+            conn['channel'].close()
+            conn['client'].close()
+            logger.debug("Connexion SSH fermée.")
+        except Exception as e:
+            logger.error(f"Erreur lors de la déconnexion: {str(e)}")
+
+@app.route('/ssh')
+def ssh_view():
+    return render_template('ssh-interface.html')
 if __name__ == '__main__':
-    app.run(debug=True)
+      socketio.run(app, host='0.0.0.0', port=5000, debug=True)
